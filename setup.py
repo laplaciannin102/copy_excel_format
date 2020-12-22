@@ -44,13 +44,13 @@ with open(file=license_path, mode='r', encoding='utf-8') as f:
 
 setup(
     name='copy_excel_format',
-    version='0.0.1',
+    version='0.0.2',
     description='copy excel format',
     long_description=readme_txt,
     author='Kosuke Asada',
     author_email='laplaciannin102@gmail.com',
     install_requires=requirements_list,
-    url='',
+    url='https://github.com/laplaciannin102/copy_excel_format',
     license=license_txt,
     packages=find_packages(exclude=('tests', 'docs')),
     test_suite='tests'
