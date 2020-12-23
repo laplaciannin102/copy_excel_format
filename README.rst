@@ -9,25 +9,25 @@ copy-excel-format
 Table of Contents
 -----------------
 
--  `copy-excel-format`_
+-  `copy-excel-format <#copy-excel-format>`__
 
-   -  `Table of Contents`_
-   -  `How to install`_
-   -  `概要`_
+   -  `Table of Contents <#table-of-contents>`__
+   -  `How to install <#how-to-install>`__
+   -  `概要 <#概要>`__
 
-      -  `何をするプログラム？`_
-      -  `注意事項`_
+      -  `何をするプログラム？ <#何をするプログラム>`__
+      -  `注意事項 <#注意事項>`__
 
-   -  `入出力`_
+   -  `入出力 <#入出力>`__
 
-      -  `入力`_
-      -  `出力`_
+      -  `入力 <#入力>`__
+      -  `出力 <#出力>`__
 
-   -  `Example`_
-   -  `Repository`_
+   -  `Example <#example>`__
+   -  `Repository <#repository>`__
 
-      -  `Github`_
-      -  `PyPI`_
+      -  `Github <#github>`__
+      -  `PyPI <#pypi>`__
 
 --------------
 
@@ -78,102 +78,171 @@ Example
 
    -  https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb
 
-\```python # Load modules import sys, os import gc import copy import
-numpy as np import pandas as pd
+.. code:: python
 
-import random
 
-import time from datetime import datetime, timedelta from
-dateutil.relativedelta import relativedelta
+   # Load modules
+   import sys, os
+   import gc
+   import copy
+   import numpy as np
+   import pandas as pd
 
-copy_excel_format
-=================
+   import random
 
-from copy_excel_format import \*
+   import time
+   from datetime import datetime, timedelta
+   from dateutil.relativedelta import relativedelta
 
-random seed
-===========
+   # copy_excel_format
+   from copy_excel_format import *
 
-np.random.seed(57) random.seed(57)
+   # random seed
+   np.random.seed(57)
+   random.seed(57)
 
-file paths
-==========
+   # file paths
+   input_path = '../input/'
+   output_path = '../output/'
+   interm_path = '../intermediate/'
 
-input_path = ‘../input/’ output_path = ‘../output/’ interm_path =
-‘../intermediate/’
+   input_template_excel_path = input_path + 'input_template_excel_sample.xlsx'
+   input_header_csv_path = input_path + 'input_header_df_sample.csv'
 
-input_template_excel_path = input_path +
-‘input_template_excel_sample.xlsx’ input_header_csv_path = input_path +
-‘input_header_df_sample.csv’
+   # header dataframe
+   header_df = pd.read_csv(input_header_csv_path)
 
-header dataframe
-================
-
-header_df = pd.read_csv(input_header_csv_path)
-
-get_sample_df
-=============
-
-def get_sample_df(n_rows=10, header_df=header_df): """
-sampleデータを作成する関数.
-
-::
-
-   Args:
-       n_rows: int, optional(default=10)
-           データ部分のDataFrameの行数.
+   # get_sample_df
+   def get_sample_df(n_rows=10, header_df=header_df):
+       """
+       sampleデータを作成する関数.
        
-       header_df: pandas.DataFrame
-           ヘッダー部分のDataFrame
-   """
-   col1_samples = ['hoge', 'fuga', 'poyo', 'gray', None]
+       Args:
+           n_rows: int, optional(default=10)
+               データ部分のDataFrameの行数.
+           
+           header_df: pandas.DataFrame
+               ヘッダー部分のDataFrame
+       """
+       col1_samples = ['hoge', 'fuga', 'poyo', 'gray', None]
+       
+       sample_df = pd.DataFrame()
+       sample_df['No.'] = range(n_rows)
+       sample_df['No.'] = sample_df['No.'] + 1
+       sample_df['date'] = [datetime(2020, 11, 20) + relativedelta(days=jj*7) for jj in range(n_rows)]
+       sample_df['col1'] = random.choices(col1_samples, k=n_rows)
+       sample_df['col2'] = np.random.randint(0, 10, size=n_rows)
+       sample_df['col3'] = np.random.randint(100, 200, size=n_rows)
+       sample_df['col4'] = random.choices(col1_samples, k=n_rows)
+       sample_df['col5'] = np.random.randint(0, 10, size=n_rows)
+       sample_df['col6'] = np.random.randint(100, 200, size=n_rows)
+       
+       # headerをつける
+       tmp_name = random.choice(['hoge', 'fuga', 'poyo'])
+       tmp_header_df = header_df.copy()
+       tmp_header_df = tmp_header_df.replace('name: <name>', 'name: ' + tmp_name)
+       
+       sample_df = tmp_header_df.append(sample_df)
+       
+       return sample_df
 
-   sample_df = pd.DataFrame()
-   sample_df['No.'] = range(n_rows)
-   sample_df['No.'] = sample_df['No.'] + 1
-   sample_df['date'] = [datetime(2020, 11, 20) + relativedelta(days=jj*7) for jj in range(n_rows)]
-   sample_df['col1'] = random.choices(col1_samples, k=n_rows)
-   sample_df['col2'] = np.random.randint(0, 10, size=n_rows)
-   sample_df['col3'] = np.random.randint(100, 200, size=n_rows)
-   sample_df['col4'] = random.choices(col1_samples, k=n_rows)
-   sample_df['col5'] = np.random.randint(0, 10, size=n_rows)
-   sample_df['col6'] = np.random.randint(100, 200, size=n_rows)
 
-   # headerをつける
-   tmp_name = random.choice(['hoge', 'fuga', 'poyo'])
-   tmp_header_df = header_df.copy()
-   tmp_header_df = tmp_header_df.replace('name: <name>', 'name: ' + tmp_name)
+   # テンプレートのexcelパスとシート名とDataFrameをセット
+   # DataFrameの数. シート数も同じ数.
+   n_df = 10
 
-   sample_df = tmp_header_df.append(sample_df)
+   # CopyExcelInfoHolderオブジェクトインスタンスのリスト
+   ceih_list = []
 
-   return sample_df
+   # ceih_listというCopyExcelInfoHolderオブジェクトインスタンスのリストを作成しておく
+   for ii in range(n_df):
+       
+       tmp_sheet_name = 'sheet' + str(ii+1).zfill(3)
+       tmp_df = get_sample_df(
+           n_rows = np.random.randint(10, 28)
+       )
 
-テンプレートのexcelパスとシート名とDataFrameをセット
-====================================================
+       ceih = CopyExcelInfoHolder(
+           template_excel_path = input_template_excel_path,
+           template_sheet_name = 'blank_template',
+           output_sheet_name = tmp_sheet_name,
+           df = tmp_df
+       )
+       
+       ceih_list += [ceih]
+       
+       del ceih
+       gc.collect()
 
-DataFrameの数. シート数も同じ数.
-================================
+   # Execute
+   # excel書式コピーを直列で実行
+   copy_excel_format(
+       ceih_list = ceih_list,
+       output_excel_path = output_path + 'output_excel_sample.xlsx',
+       cef_manual_set_rows = None,
+       cef_force_dimension_copy = False,
+       cef_debug_mode = True,
+       write_index = False,
+       write_header = False,
+       copy_values = False
+   )
 
-n_df = 10
+   # excel書式コピーを並列で実行1(1つの関数で実行)
+   copy_excel_format_parallel(
+       ceih_list = ceih_list,
+       output_excel_path = output_path + 'output_excel_sample_parallel001.xlsx',
+       tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
+       parallel_method = 'multiprocess',
+       n_jobs = None,
+       copy_sheet_method = 'xlwings',
+       sorted_sheet_names_list = None,
+       del_tmp_dir = True,
+       n_seconds_to_sleep = 1,
+       cef_manual_set_rows = None,
+       cef_force_dimension_copy = False,
+       cef_debug_mode = True,
+       write_index = False,
+       write_header = False,
+       copy_values = False
+   )
 
-CopyExcelInfoHolderオブジェクトインスタンスのリスト
-===================================================
+   # excel書式コピーを並列で実行2(2つの関数に分けて実行)
+   # 並列処理を行い, 一時的な書式設定済みのexcelファイルを出力する.
+   output_temporary_excel_parallel(
+       ceih_list = ceih_list,
+       tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
+       parallel_method = 'multiprocess',
+       n_jobs = None,
+       cef_manual_set_rows = None,
+       cef_force_dimension_copy = False,
+       cef_debug_mode = True,
+       write_index = False,
+       write_header = False,
+       copy_values = False
+   )
 
-ceih_list = []
+   # 一時的に出力した複数のexcelファイルをまとめて複数シートを持つ1つのexcelファイルとする.
+   copy_excel_format_from_temporary_files(
+       ceih_list = ceih_list,
+       output_excel_path = output_path + 'output_excel_sample_parallel002.xlsx',
+       tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
+       copy_sheet_method = 'xlwings',
+       sorted_sheet_names_list = None,
+       del_tmp_dir = True,
+       n_seconds_to_sleep = 1
+   )
 
-ceih_listというCopyE
-====================
+--------------
 
-.. _copy-excel-format: #copy-excel-format
-.. _Table of Contents: #table-of-contents
-.. _How to install: #how-to-install
-.. _概要: #概要
-.. _何をするプログラム？: #何をするプログラム
-.. _注意事項: #注意事項
-.. _入出力: #入出力
-.. _入力: #入力
-.. _出力: #出力
-.. _Example: #example
-.. _Repository: #repository
-.. _Github: #github
-.. _PyPI: #pypi
+Repository
+----------
+
+Github
+~~~~~~
+
+-  https://github.com/laplaciannin102/copy_excel_format
+
+PyPI
+~~~~
+
+-  https://pypi.org/project/copy_excel_format/

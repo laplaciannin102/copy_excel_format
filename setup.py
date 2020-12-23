@@ -44,7 +44,7 @@ with open(file=license_path, mode='r', encoding='utf-8') as f:
 
 setup(
     name='copy_excel_format',
-    version='0.0.2',
+    version='0.1.0',
     description='copy excel format',
     long_description=readme_txt,
     author='Kosuke Asada',

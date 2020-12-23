@@ -62,6 +62,7 @@ pip install copy_excel_format
   - [https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb](https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb)
 
 ```python
+
 # Load modules
 import sys, os
 import gc
@@ -212,6 +213,7 @@ copy_excel_format_from_temporary_files(
     del_tmp_dir = True,
     n_seconds_to_sleep = 1
 )
+
 ```
 
 ---
