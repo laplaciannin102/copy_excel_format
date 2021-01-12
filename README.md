@@ -2,7 +2,7 @@
 
 - author: laplaciannin102(Kosuke Asada)
 - date: 2021/01/12
-- latest version: 0.1.1
+- latest version: 0.1.9
 
 ---
 
@@ -140,10 +140,9 @@ cef.copy_excel_format(
 
 ## Example
 
-- sample ipynb:
-  - [https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb](https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb)
+- sample ipynb: [Githubリンク](https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/copy_excel_format_sample.ipynb)
 
-- sample program
+- sample program:
 
 ```python
 

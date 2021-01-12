@@ -5,7 +5,7 @@
 """
 @author: Kosuke Asada
 @date: 2020/12/23
-@version: 0.1.1
+@version: 0.1.9
 
 sample data setを読み込む.
 

@@ -5,7 +5,7 @@
 """
 @author: Kosuke Asada
 @date: 2021/01/12
-@version: 0.1.1
+@version: 0.1.9
 
 Excel sheetにテーブル(pandas.DataFrame)を書式付きで書き込む.
 

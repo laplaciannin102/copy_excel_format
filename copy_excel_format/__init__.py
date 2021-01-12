@@ -5,7 +5,7 @@
 """
 @author: Kosuke Asada
 @date: 2021/01/12
-@version: 0.1.1
+@version: 0.1.9
 
 全ての自作moduleをimport
 """
