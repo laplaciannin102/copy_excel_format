@@ -1,31 +1,50 @@
+# --------------------------------------------------------------------------------
 # Load modules
-import sys, os
+# --------------------------------------------------------------------------------
+## copy-excel-format module
+import copy_excel_format as cef
+
+## other modules
 import gc
-import copy
 import numpy as np
 import pandas as pd
-
 import random
-
 import time
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-# copy_excel_format
-from copy_excel_format import *
 
+# --------------------------------------------------------------------------------
+# Configure
+# --------------------------------------------------------------------------------
 # random seed
 np.random.seed(57)
 random.seed(57)
 
-# file paths
-input_path = '../input/'
-output_path = '../output/'
-interm_path = '../intermediate/'
 
+# --------------------------------------------------------------------------------
+# Constants
+# --------------------------------------------------------------------------------
+# paths
+## directory paths
+input_path = './input/'
+output_path = './output/'
+interm_path = './intermediate/'
+
+## file paths
 input_template_excel_path = input_path + 'input_template_excel_sample.xlsx'
 input_header_csv_path = input_path + 'input_header_df_sample.csv'
 
+
+# --------------------------------------------------------------------------------
+# Load sample files
+# --------------------------------------------------------------------------------
+cef.load_sample_files()
+
+
+# --------------------------------------------------------------------------------
+# Functions
+# --------------------------------------------------------------------------------
 # header dataframe
 header_df = pd.read_csv(input_header_csv_path)
 
@@ -64,6 +83,9 @@ def get_sample_df(n_rows=10, header_df=header_df):
     return sample_df
 
 
+# --------------------------------------------------------------------------------
+# excel書式コピー準備
+# --------------------------------------------------------------------------------
 # テンプレートのexcelパスとシート名とDataFrameをセット
 # DataFrameの数. シート数も同じ数.
 n_df = 10
@@ -79,7 +101,7 @@ for ii in range(n_df):
         n_rows = np.random.randint(10, 28)
     )
 
-    ceih = CopyExcelInfoHolder(
+    ceih = cef.CopyExcelInfoHolder(
         template_excel_path = input_template_excel_path,
         template_sheet_name = 'blank_template',
         output_sheet_name = tmp_sheet_name,
@@ -91,9 +113,12 @@ for ii in range(n_df):
     del ceih
     gc.collect()
 
+
+# --------------------------------------------------------------------------------
 # Execute
+# --------------------------------------------------------------------------------
 # excel書式コピーを直列で実行
-copy_excel_format(
+cef.copy_excel_format(
     ceih_list = ceih_list,
     output_excel_path = output_path + 'output_excel_sample.xlsx',
     cef_manual_set_rows = None,
@@ -105,7 +130,7 @@ copy_excel_format(
 )
 
 # excel書式コピーを並列で実行1(1つの関数で実行)
-copy_excel_format_parallel(
+cef.copy_excel_format_parallel(
     ceih_list = ceih_list,
     output_excel_path = output_path + 'output_excel_sample_parallel001.xlsx',
     tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
@@ -125,7 +150,7 @@ copy_excel_format_parallel(
 
 # excel書式コピーを並列で実行2(2つの関数に分けて実行)
 # 並列処理を行い, 一時的な書式設定済みのexcelファイルを出力する.
-output_temporary_excel_parallel(
+cef.output_temporary_excel_parallel(
     ceih_list = ceih_list,
     tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
     parallel_method = 'multiprocess',
@@ -139,7 +164,7 @@ output_temporary_excel_parallel(
 )
 
 # 一時的に出力した複数のexcelファイルをまとめて複数シートを持つ1つのexcelファイルとする.
-copy_excel_format_from_temporary_files(
+cef.copy_excel_format_from_temporary_files(
     ceih_list = ceih_list,
     output_excel_path = output_path + 'output_excel_sample_parallel002.xlsx',
     tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',

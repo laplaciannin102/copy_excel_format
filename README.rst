@@ -2,7 +2,8 @@ copy-excel-format
 =================
 
 -  author: laplaciannin102(Kosuke Asada)
--  date: 2020/12/23
+-  date: 2021/01/12
+-  latest version: 0.1.1
 
 --------------
 
@@ -20,9 +21,10 @@ Table of Contents
 
    -  `入出力 <#入出力>`__
 
-      -  `入力 <#入力>`__
-      -  `出力 <#出力>`__
+      -  `入力(Input) <#入力input>`__
+      -  `出力(Output) <#出力output>`__
 
+   -  `使用手順 <#使用手順>`__
    -  `Example <#example>`__
    -  `Repository <#repository>`__
 
@@ -46,28 +48,116 @@ How to install
 何をするプログラム？
 ~~~~~~~~~~~~~~~~~~~~
 
--  たくさんのテーブル(DataFrameを想定)をたくさんの書式付きexcelシートとして出力.
+-  たくさんのテーブル(DataFrameを想定)をたくさんの書式付きexcelシートとして出力する.
 
 注意事項
 ~~~~~~~~
 
 -  xlwingsを使用して並列処理する場合はexcelのインストール(Office)が必要.
+-  テスト等きちんと出来ていないのでバグがある可能性あり.
 
 --------------
 
 入出力
 ------
 
-入力
-~~~~
+入力(Input)
+~~~~~~~~~~~
 
--  複数のpandas.DataFrame
--  書式のテンプレートとして使用したいexcelシート
+-  複数のpandas.DataFrame.
+-  書式のテンプレートとして使用したいexcelシート.
 
-出力
-~~~~
+出力(Output)
+~~~~~~~~~~~~
 
--  書式付きでテーブルの値が入力済みシートが複数あるexcelファイル
+-  **書式付き**,
+   **テーブルの値が入力済み**\ のシートが複数あるexcelファイル.
+
+   -  書式はテンプレートexcelファイルのもの.
+   -  テーブルの値はpandas.DataFrameのもの.
+
+--------------
+
+使用手順
+--------
+
+-  以下, JupyterNotebookなどのPython環境での操作を想定しています.
+
+-  copy-excel-formatモジュールをimportします.
+
+.. code:: python
+
+   import copy_excel_format as cef
+
+-  テンプレートとなるexcelファイルを準備します.
+
+   -  下記を実行すると,
+      sampleのexcelファイルおよびディレクトリ構成を取得, 設定できます.
+   -  とりあえず試してみたい時にご使用ください.
+
+.. code:: python
+
+   cef.load_sample_files()
+
+-  pandas.DataFrameを複数準備します.
+
+.. code:: python
+
+   import pandas as pd
+   df0 = pd.DataFrame(...) # 1つ目のpandas.DataFrame
+   df1 = pd.DataFrame(...) # 2つ目のpandas.DataFrame
+
+-  テンプレートexcelファイルのパス, pandas.DataFrameオブジェクト,
+   そのDataFrameの値を入力したいシートのシート名を引数にCopyExcelInfoHolderオブジェクトを作成し,
+   list変数に格納します.
+
+.. code:: python
+
+   """
+   df0: 1つ目のpandas.DataFrame
+   df1: 2つ目のpandas.DataFrame
+   input_template_excel_path: テンプレートexcelファイルのパス
+   sheet_name0: 1つ目のsheet_name
+   sheet_name1: 2つ目のsheet_name
+   """
+
+   # CopyExcelInfoHolderオブジェクトの作成
+   ceih0 = cef.CopyExcelInfoHolder(
+       template_excel_path = input_template_excel_path,
+       template_sheet_name = 'blank_template',
+       output_sheet_name = sheet_name0,
+       df = df0
+   )
+
+   ceih1 = cef.CopyExcelInfoHolder(
+       template_excel_path = input_template_excel_path,
+       template_sheet_name = 'blank_template',
+       output_sheet_name = sheet_name1,
+       df = df1
+   )
+
+   ceih_list = [ceih0, ceih1] # list変数
+
+-  copy_excel_format関数を実行します.
+
+   -  下記は直列処理での実行例.
+   -  output_excel_pathには出力excelファイルのパスを与えます.
+
+.. code:: python
+
+   # excel書式コピーを直列で実行
+   cef.copy_excel_format(
+       ceih_list = ceih_list,
+       output_excel_path = output_path + 'output_excel_sample.xlsx',
+       cef_manual_set_rows = None,
+       cef_force_dimension_copy = False,
+       cef_debug_mode = True,
+       write_index = False,
+       write_header = False,
+       copy_values = False
+   )
+
+[end]
 
 --------------
 
@@ -78,37 +168,58 @@ Example
 
    -  https://github.com/laplaciannin102/copy_excel_format/blob/master/examples/src/copy_excel_format_sample.ipynb
 
+-  sample program
+
 .. code:: python
 
 
+   # --------------------------------------------------------------------------------
    # Load modules
-   import sys, os
+   # --------------------------------------------------------------------------------
+   ## copy-excel-format module
+   import copy_excel_format as cef
+
+   ## other modules
    import gc
-   import copy
    import numpy as np
    import pandas as pd
-
    import random
-
    import time
    from datetime import datetime, timedelta
    from dateutil.relativedelta import relativedelta
 
-   # copy_excel_format
-   from copy_excel_format import *
 
+   # --------------------------------------------------------------------------------
+   # Configure
+   # --------------------------------------------------------------------------------
    # random seed
    np.random.seed(57)
    random.seed(57)
 
-   # file paths
-   input_path = '../input/'
-   output_path = '../output/'
-   interm_path = '../intermediate/'
 
+   # --------------------------------------------------------------------------------
+   # Constants
+   # --------------------------------------------------------------------------------
+   # paths
+   ## directory paths
+   input_path = './input/'
+   output_path = './output/'
+   interm_path = './intermediate/'
+
+   ## file paths
    input_template_excel_path = input_path + 'input_template_excel_sample.xlsx'
    input_header_csv_path = input_path + 'input_header_df_sample.csv'
 
+
+   # --------------------------------------------------------------------------------
+   # Load sample files
+   # --------------------------------------------------------------------------------
+   cef.load_sample_files()
+
+
+   # --------------------------------------------------------------------------------
+   # Functions
+   # --------------------------------------------------------------------------------
    # header dataframe
    header_df = pd.read_csv(input_header_csv_path)
 
@@ -147,6 +258,9 @@ Example
        return sample_df
 
 
+   # --------------------------------------------------------------------------------
+   # excel書式コピー準備
+   # --------------------------------------------------------------------------------
    # テンプレートのexcelパスとシート名とDataFrameをセット
    # DataFrameの数. シート数も同じ数.
    n_df = 10
@@ -162,7 +276,7 @@ Example
            n_rows = np.random.randint(10, 28)
        )
 
-       ceih = CopyExcelInfoHolder(
+       ceih = cef.CopyExcelInfoHolder(
            template_excel_path = input_template_excel_path,
            template_sheet_name = 'blank_template',
            output_sheet_name = tmp_sheet_name,
@@ -174,9 +288,12 @@ Example
        del ceih
        gc.collect()
 
+
+   # --------------------------------------------------------------------------------
    # Execute
+   # --------------------------------------------------------------------------------
    # excel書式コピーを直列で実行
-   copy_excel_format(
+   cef.copy_excel_format(
        ceih_list = ceih_list,
        output_excel_path = output_path + 'output_excel_sample.xlsx',
        cef_manual_set_rows = None,
@@ -188,7 +305,7 @@ Example
    )
 
    # excel書式コピーを並列で実行1(1つの関数で実行)
-   copy_excel_format_parallel(
+   cef.copy_excel_format_parallel(
        ceih_list = ceih_list,
        output_excel_path = output_path + 'output_excel_sample_parallel001.xlsx',
        tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
@@ -208,7 +325,7 @@ Example
 
    # excel書式コピーを並列で実行2(2つの関数に分けて実行)
    # 並列処理を行い, 一時的な書式設定済みのexcelファイルを出力する.
-   output_temporary_excel_parallel(
+   cef.output_temporary_excel_parallel(
        ceih_list = ceih_list,
        tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',
        parallel_method = 'multiprocess',
@@ -222,7 +339,7 @@ Example
    )
 
    # 一時的に出力した複数のexcelファイルをまとめて複数シートを持つ1つのexcelファイルとする.
-   copy_excel_format_from_temporary_files(
+   cef.copy_excel_format_from_temporary_files(
        ceih_list = ceih_list,
        output_excel_path = output_path + 'output_excel_sample_parallel002.xlsx',
        tmp_output_excel_dir_path = interm_path + 'tmp_output_excel/',

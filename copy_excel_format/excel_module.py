@@ -4,8 +4,8 @@
 
 """
 @author: Kosuke Asada
-@date: 2020/12/23
-@version: 0.1.0
+@date: 2021/01/12
+@version: 0.1.1
 
 Excel sheetにテーブル(pandas.DataFrame)を書式付きで書き込む.
 
@@ -59,18 +59,18 @@ from openpyxl.utils import get_column_letter
 
 def pro_round(num, ndigits=0):
     """
-    数字を四捨五入で丸める。
+    数字を四捨五入で丸める.
 
     Args:
         num: int or float
-            丸めたい数字。
+            丸めたい数字.
 
         ndigits: int, optional(default=0)
-            丸めた後の小数部分の桁数。
+            丸めた後の小数部分の桁数.
 
     Returns:
         rounded: int or float
-            丸めた後の数字。
+            丸めた後の数字.
     """
     num *= 10 ** ndigits
     rounded = ( 2 * num + 1 ) // 2
@@ -89,11 +89,11 @@ def get_elapsed_time(start, print_time=True):
 
     Args:
         start: float
-            計測開始時間。
+            計測開始時間.
     
     Returns:
         elapsed_time: float
-            経過時間。
+            経過時間.
     """
     end = time.time()
     elapsed_time = float(end - start)
@@ -265,12 +265,12 @@ plf = parallel_func
 
 def pro_makedirs(dir_path):
     """
-    ディレクトリを作成する。指定のディレクトリが存在しない場合のみ作成する。
-    深い階層のディレクトリを指定した場合、途中階層のディレクトリも全て作成する。
+    ディレクトリを作成する.指定のディレクトリが存在しない場合のみ作成する.
+    深い階層のディレクトリを指定した場合、途中階層のディレクトリも全て作成する.
 
     Arg:
         dir_path: str
-            ディレクトリのパス。
+            ディレクトリのパス.
     """
     dir_path = str(dir_path)
     if not os.path.isdir(dir_path):

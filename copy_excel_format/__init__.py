@@ -4,11 +4,14 @@
 
 """
 @author: Kosuke Asada
-@date: 2020/12/23
-@version: 0.1.0
+@date: 2021/01/12
+@version: 0.1.1
 
 全ての自作moduleをimport
 """
 
 # 自作moduleのimport
 from .excel_module import *
+
+# sample datasetsのimport
+from .datasets import *

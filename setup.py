@@ -44,7 +44,7 @@ with open(file=license_path, mode='r', encoding='utf-8') as f:
 
 setup(
     name='copy_excel_format',
-    version='0.1.0',
+    version='0.1.7',
     description='copy excel format',
     long_description=readme_txt,
     author='Kosuke Asada',
@@ -52,7 +52,20 @@ setup(
     install_requires=requirements_list,
     url='https://github.com/laplaciannin102/copy_excel_format',
     license=license_txt,
-    packages=find_packages(exclude=('tests', 'docs')),
+    # packages=find_packages(exclude=('tests', 'docs')),
+    packages=[
+        'copy_excel_format',
+        'copy_excel_format/datasets'
+    ],
+    package_dir={
+        'copy_excel_format': 'copy_excel_format'
+    },
+    package_data={
+        'copy_excel_format': [
+            'datasets/sample_data/*.csv',
+            'datasets/sample_data/*.xlsx'
+        ]
+    },
     test_suite='tests'
 )
 
